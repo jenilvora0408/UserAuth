@@ -1,0 +1,38 @@
+﻿@model UserAuth.Entities.ViewModels.UpsertStudentViewModel
+
+<div class="container-fluid">
+    <div class="p-5">
+        <form method="post" asp-controller="Student" asp-action="UpsertStudent" class="d-flex flex-column gap-3">
+            <input type="hidden" asp-for="StudentId" />
+            <div>
+                <label>Student Name</label>
+                <input type="text" asp-for="@Model.Name" class="form-control shadow-none" placeholder="Ninja Hathori"/>
+                <span class="text-danger" asp-validation-for="@Model.Name"></span>
+            </div>
+            <div>
+                <label>Enrollment</label>
+                <input type="text" asp-for="@Model.Enrollment" class="form-control shadow-none" placeholder="19001070" />
+                <span class="text-danger" asp-validation-for="@Model.Enrollment"></span>
+            </div>
+            <div>
+                <label>Status</label>
+                @Html.DropDownListFor(m => m.Status, ViewBag.Status as List<SelectListItem>, "Select Status", new { @class = "form-control shadow-none", required = "required" })
+                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+            </div>
+            <div>
+                <label>Course</label>
+                @Html.DropDownListFor(m => m.CourseId, ViewBag.Course as List<SelectListItem>, "Select Course", new { @class = "form-control shadow-none", required = "required"})
+                @Html.ValidationMessageFor(model => model.CourseId, "", new { @class = "text-danger"})
+            </div>
+            <div>
+                <label>Date of Birth</label>
+                <input type="date" min="2016-01-01" max="@DateTime.UtcNow.ToString("yyyy-MM-dd")" asp-for="@Model.DateOfBirth" class="form-control shadow-none"  />
+                <span asp-validation-for="@Model.DateOfBirth" class="text-danger"></span>
+            </div>
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-success">Submit</button>
+                <button type="reset" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,146 @@
+﻿@model IEnumerable<UserAuth.Entities.ViewModels.UpsertStudentViewModel>
+
+@{
+    ViewData["Title"] = "GetAllStudents";
+}
+
+<h1>GetAllStudents</h1>
+
+<p>
+    <a asp-action="UpsertStudent">Create New</a>
+</p>
+
+<div class="d-flex gap-3 mb-4">
+    <div class="search-container w-50">
+        <input class="form-control shadow-none" id="searchKey" placeholder="Search by Student & Course Name" />
+    </div>
+    <div class="filter-container w-50">
+        <select class="form-control shadow-none" id="filterKey">
+            <option value="">All</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+    </div>
+    <button id="applyFilter" class="btn btn-primary">Apply</button>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a href="#" class="sort" data-column="StudentId" data-direction="asc">
+                    Student ID <i class="bi bi-arrow-up"></i>
+                </a>
+            </th>
+            <th>
+                <a href="#" class="sort" data-column="Name" data-direction="asc">
+                    Name <i class="bi bi-arrow-up"></i>
+                </a>
+            </th>
+            <th>
+                <a href="#" class="sort" data-column="Enrollment" data-direction="asc">
+                    Enrollment <i class="bi bi-arrow-up"></i>
+                </a>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateOfBirth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CourseName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StudentId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Enrollment)
+            </td>
+            <td>
+                @if(item.Status == 1){
+                    <span>Active</span>
+                }
+                else{
+                    <span>Inactive</span>
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfBirth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CourseName)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "UpsertStudent", new { Id=item.StudentId }) |
+                    <a asp-action="DeleteStudent" asp-route-Id="@item.StudentId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        function fetchData(search = "", filter = "", sortColumn = "", sortDirection = "asc") {
+            $.ajax({
+                url: "/Student/GetAllStudents",
+                type: "GET",
+                data: { search: search, filter: filter, sortColumn: sortColumn, sortDirection: sortDirection },
+                success: function (response) {
+                    $("tbody").html($(response).find("tbody").html());
+                },
+                error: function () {
+                    alert("Failed to load data.");
+                }
+            });
+        }
+
+        // Search on enter key
+        $("#searchKey").on("keypress", function (event) {
+            if (event.key === "Enter") {
+                fetchData($("#searchKey").val(), $("#filterKey").val());
+            }
+        });
+
+        // Apply filter button
+        $("#applyFilter").on("click", function () {
+            fetchData($("#searchKey").val(), $("#filterKey").val());
+        });
+
+        // Sorting functionality
+        $(".sort").on("click", function (event) {
+            event.preventDefault();
+
+            const column = $(this).data("column");
+            let direction = $(this).attr("data-direction") || "asc";
+            direction = direction === "asc" ? "desc" : "asc";
+            $(this).attr("data-direction", direction);
+
+            // Reset all icons to default
+            $(".sort i").removeClass("bi-arrow-up bi-arrow-down").addClass("bi-arrow-up");
+
+            // Update the clicked column icon
+            const icon = $(this).find("i");
+            if (direction === "asc") {
+                icon.removeClass("bi-arrow-down").addClass("bi-arrow-up");
+            } else {
+                icon.removeClass("bi-arrow-up").addClass("bi-arrow-down");
+            }
+
+            fetchData($("#searchKey").val(), $("#filterKey").val(), column, direction);
+        });
+    });
+</script>
